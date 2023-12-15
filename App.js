@@ -21,7 +21,7 @@ export default function App() {
   const [duration, setDuration] = useState(0);
   const [currentDuration, setCurrentDuration] = useState(0);
   const API_URL =
-    'https://api.pexels.com/videos/search?query=animals&per_page=12&page=1';
+    'https://api.pexels.com/videos/search?query=adventure&per_page=20&page=1';
   const [videos, setVideos] = useState([]);
   const ref = useRef();
   const videoref = useRef(null);
@@ -32,8 +32,8 @@ export default function App() {
       offset: activeIndx * width,
       animated: true,
     });
-    setDuration(videos[activeIndx]?.duration);
     setCurrentDuration(0)
+    setDuration(videos[activeIndx]?.duration);
     console.log('useEffect called',currentDuration)
     if (videoref.current) {
       console.log('seek called', activeIndx);
@@ -41,9 +41,7 @@ export default function App() {
     }
   }, [activeIndx]);
   const onProgress = data => {
-    if(data.currentTime>0){
     setCurrentDuration(Math.floor((data.currentTime))/duration)
-    }
   };
 
   const renderItem = ({item, index}) => {
@@ -73,7 +71,7 @@ export default function App() {
         });
         let data = await response.json();
         let filtered_video = await data.videos.filter(
-          e => e?.duration < 50 && e?.duration > 20,
+          e => e?.duration < 10,
         );
         setActiveIdx(0)
         setVideos(filtered_video);
@@ -97,9 +95,18 @@ export default function App() {
   const moveforward=()=>{
     if(activeIndx < videos.length - 1){
       setActiveIdx(prev=>prev+1)
+      setCurrentDuration(0)
     }else{
       setShowStatus(false)
      setActiveIdx(0)
+    }
+  }
+  const moveBackward=()=>{
+    if(activeIndx>0){
+      setActiveIdx(prev=>prev-1)
+      setCurrentDuration(0)
+    }else{
+      return
     }
   }
   return (
@@ -157,7 +164,7 @@ export default function App() {
       </View>
       <View style={{position:'absolute',height:height,width,flexDirection:'row'}}>
         <TouchableOpacity style={{height,width:width/2}}
-        onPress={()=>{activeIndx>0?setActiveIdx(prev=>prev-1):null}}
+        onPress={moveBackward}
         >
         </TouchableOpacity>
         <TouchableOpacity style={{height,width:width/2}}
